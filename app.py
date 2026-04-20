@@ -19,152 +19,238 @@ def get_training_artifacts():
 
 artifacts = get_training_artifacts()
 
+SPECIES_LABELS = {0: "Adeline", 1: "Chinstrap", 2: "Gentoo"}
+
 
 def inject_css() -> None:
     st.markdown(
         """
         <style>
-            @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap');
+            @import url('https://fonts.googleapis.com/css2?family=DM+Sans:ital,wght@0,300;0,400;0,500;0,600;1,400&family=DM+Mono:wght@400;500&display=swap');
 
             html, body, [class*="css"] {
-                font-family: 'Poppins', sans-serif;
-                color: #243b53;
+                font-family: 'DM Sans', sans-serif;
+                color: #1a2211;
             }
 
-            .stApp {
-                background: linear-gradient(180deg, #f8fbff 0%, #eef3f8 100%);
-            }
+            .stApp { background: #f0f4ee; }
 
-            .hero-box {
-                background: #ffffff;
-                border: 1px solid #d9e2ec;
-                border-left: 6px solid #2f855a;
-                border-radius: 18px;
-                padding: 1.4rem 1.5rem;
-                box-shadow: 0 8px 18px rgba(15, 23, 42, 0.05);
-                margin-bottom: 1rem;
+            /* ── Hero ── */
+            .hero {
+                background: #1b4332;
+                border-radius: 20px;
+                padding: 28px 32px;
+                margin-bottom: 1.4rem;
+                position: relative;
+                overflow: hidden;
             }
-
-            .main-title {
-                font-size: 2.2rem;
-                font-weight: 700;
-                color: #102a43;
-                margin-bottom: 0.35rem;
+            .hero::before {
+                content: '';
+                position: absolute;
+                top: -40px; right: -40px;
+                width: 220px; height: 220px;
+                border-radius: 50%;
+                background: rgba(255,255,255,0.04);
             }
-
-            .subtitle {
-                font-size: 1rem;
-                line-height: 1.7;
-                color: #486581;
+            .hero::after {
+                content: '🐧';
+                font-size: 100px;
+                position: absolute;
+                right: 28px; bottom: -14px;
+                opacity: 0.18;
+                pointer-events: none;
             }
-
-            .card {
-                background: #ffffff;
-                border: 1px solid #d9e2ec;
-                border-radius: 16px;
-                padding: 1rem 1.1rem;
-                box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04);
-                margin-bottom: 0.5rem;
-            }
-
-            .metric-label {
-                color: #627d98;
-                font-size: 0.92rem;
-                margin-bottom: 0.2rem;
-            }
-
-            .metric-value {
-                color: #2f855a;
+            .hero-title {
                 font-size: 2rem;
                 font-weight: 700;
+                color: #fff;
+                letter-spacing: -0.4px;
+                line-height: 1.2;
+            }
+            .hero-sub {
+                font-size: 0.9rem;
+                color: #95d5b2;
+                margin-top: 6px;
+            }
+            .hero-pill {
+                display: inline-flex;
+                align-items: center;
+                gap: 6px;
+                background: rgba(255,255,255,0.1);
+                border: 1px solid rgba(255,255,255,0.15);
+                border-radius: 100px;
+                padding: 5px 14px;
+                font-size: 0.8rem;
+                color: #d8f3dc;
+                margin-top: 14px;
             }
 
-            .content-panel {
-                background: #ffffff;
-                border: 1px solid #d9e2ec;
-                border-radius: 16px;
-                padding: 1.2rem;
-                box-shadow: 0 6px 16px rgba(15, 23, 42, 0.04);
-            }
-
-            .prediction-box {
-                background: #2f855a;
-                color: white;
+            /* ── Metric cards ── */
+            .metric-card {
+                background: #fff;
+                border: 1px solid #dde5d8;
                 border-radius: 14px;
-                padding: 1rem 1.15rem;
-                margin-top: 1rem;
+                padding: 20px 18px;
+                display: flex;
+                flex-direction: column;
+                gap: 2px;
             }
-
-            .prediction-title {
-                font-size: 0.85rem;
+            .metric-icon { font-size: 1.3rem; margin-bottom: 4px; }
+            .metric-label {
+                font-size: 0.72rem;
+                color: #7d9070;
                 text-transform: uppercase;
-                letter-spacing: 0.08rem;
-                opacity: 0.85;
+                letter-spacing: 0.9px;
             }
-
-            .prediction-species {
-                font-size: 1.8rem;
+            .metric-value {
+                font-size: 2.1rem;
                 font-weight: 700;
-                margin-top: 0.2rem;
+                color: #2d6a4f;
+                line-height: 1.1;
             }
+            .metric-sub { font-size: 0.75rem; color: #9aab8e; }
 
+            /* ── Tabs ── */
             .stTabs [data-baseweb="tab-list"] {
-                gap: 0.4rem;
-                margin-top: 0.75rem;
+                gap: 4px;
+                background: transparent;
+                border-bottom: 2px solid #dde5d8;
+                padding-bottom: 0;
             }
-
             .stTabs [data-baseweb="tab"] {
-                background: #ffffff;
-                border: 1px solid #d9e2ec;
-                border-radius: 10px 10px 0 0;
-                color: #486581;
-                font-weight: 600;
-                padding: 0.65rem 1rem;
+                background: transparent !important;
+                border: none !important;
+                border-bottom: 2px solid transparent !important;
+                border-radius: 0 !important;
+                color: #7d9070;
+                font-weight: 500;
+                padding: 0.5rem 1.1rem;
+                font-size: 0.9rem;
+                margin-bottom: -2px;
             }
-
             .stTabs [aria-selected="true"] {
-                background: #2f855a !important;
-                border-color: #2f855a !important;
-                color: white !important;
+                color: #2d6a4f !important;
+                border-bottom: 2px solid #2d6a4f !important;
             }
+            .stTabs [data-baseweb="tab-panel"] { padding-top: 1.2rem; }
 
-            h2, h3 {
-                color: #102a43 !important;
+            /* ── Cards ── */
+            .card {
+                background: #fff;
+                border: 1px solid #dde5d8;
+                border-radius: 16px;
+                padding: 22px 24px;
             }
-
-            .stSelectbox label,
-            .stNumberInput label {
-                color: #102a43 !important;
+            .card-title {
+                font-size: 0.95rem;
                 font-weight: 600;
+                color: #1b4332;
+                margin-bottom: 14px;
+                display: flex;
+                align-items: center;
+                gap: 8px;
             }
 
+            /* ── Species badges ── */
+            .badge {
+                display: inline-block;
+                padding: 2px 10px;
+                border-radius: 100px;
+                font-size: 0.75rem;
+                font-weight: 500;
+            }
+            .badge-0 { background: #fde8d0; color: #7c3510; }
+            .badge-1 { background: #d4e8f8; color: #1a457a; }
+            .badge-2 { background: #d4f0e4; color: #165c38; }
+
+            /* ── Form ── */
+            .stSelectbox label,
+            .stSlider label {
+                color: #1a2211 !important;
+                font-weight: 600 !important;
+                font-size: 0.85rem !important;
+            }
+
+            /* ── Buttons ── */
             .stButton > button {
                 width: 100%;
-                background: #2f855a;
-                color: white;
+                background: #2d6a4f;
+                color: #fff;
                 border: none;
-                border-radius: 10px;
-                padding: 0.78rem 1rem;
-                font-weight: 600;
-            }
-
-            .stButton > button:hover {
-                background: #276749;
-            }
-
-            .small-note {
-                font-size: 0.92rem;
-                color: #627d98;
-                margin-top: 0.35rem;
-            }
-
-            .step-box {
-                background: #f7fafc;
-                border: 1px dashed #bcccdc;
                 border-radius: 12px;
-                padding: 0.85rem 0.95rem;
-                margin-top: 0.75rem;
+                padding: 0.8rem 1rem;
+                font-weight: 600;
+                font-size: 0.95rem;
+                letter-spacing: 0.1px;
+                transition: background 0.15s, transform 0.1s;
             }
+            .stButton > button:hover {
+                background: #1b4332;
+                border: none;
+                transform: translateY(-1px);
+            }
+            .stButton > button:active { transform: translateY(0); }
+
+            /* ── Result ── */
+            .result-wrap {
+                background: #1b4332;
+                border-radius: 14px;
+                padding: 22px;
+                text-align: center;
+                margin-top: 14px;
+                animation: pop .25s ease;
+            }
+            @keyframes pop {
+                from { opacity: 0; transform: scale(.96); }
+                to   { opacity: 1; transform: scale(1); }
+            }
+            .result-emoji { font-size: 2.6rem; }
+            .result-eyebrow {
+                font-size: 0.68rem;
+                text-transform: uppercase;
+                letter-spacing: 1.2px;
+                color: #95d5b2;
+                margin-top: 8px;
+            }
+            .result-name {
+                font-size: 2rem;
+                font-weight: 700;
+                color: #fff;
+                margin-top: 2px;
+            }
+            .result-desc {
+                font-size: 0.8rem;
+                color: #95d5b2;
+                margin-top: 6px;
+                line-height: 1.5;
+            }
+
+            /* ── Info callout ── */
+            .callout {
+                background: #eaf5ee;
+                border-left: 3px solid #52b788;
+                border-radius: 0 10px 10px 0;
+                padding: 10px 14px;
+                font-size: 0.82rem;
+                color: #1b4d2e;
+                margin-top: 14px;
+                line-height: 1.5;
+            }
+
+            /* ── Tips table ── */
+            .tip-row {
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+                padding: 9px 0;
+                border-bottom: 1px solid #f0f4ee;
+                font-size: 0.85rem;
+                gap: 12px;
+            }
+            .tip-row:last-child { border-bottom: none; }
+            .tip-hint { color: #7d9070; font-size: 0.8rem; }
+
+            h2, h3 { color: #1b4332 !important; }
         </style>
         """,
         unsafe_allow_html=True,
@@ -173,174 +259,174 @@ def inject_css() -> None:
 
 inject_css()
 
+# ── Hero ──────────────────────────────────────────────────────────────────────
 st.markdown(
     """
-    <div class="hero-box">
-        <div class="main-title">Classificador de Especies de Pinguins</div>
-        <div class="subtitle">
-            Projeto pratico da AG2 com leitura do CSV, tratamento dos dados,
-            treinamento de um modelo Decision Tree e classificacao de novas amostras.
-        </div>
-        <div class="subtitle">
-            Alunos: Paulo Vicente de Carvalho Porto e Romulo Coutinho
-        </div>
-        <div class="small-note">
+    <div class="hero">
+        <div class="hero-title">Classificador de Pinguins</div>
+        <div class="hero-sub">Decision Tree · Palmer Penguins Dataset · AG2</div>
+        <div class="hero-pill">
+            👤 Paulo Vicente de Carvalho Porto &nbsp;·&nbsp; Romulo Coutinho
         </div>
     </div>
     """,
     unsafe_allow_html=True,
 )
 
-metric_col1, metric_col2, metric_col3 = st.columns(3)
-
-with metric_col1:
-    st.markdown(
-        f"""
-        <div class="card">
-            <div class="metric-label">Total de amostras validas</div>
-            <div class="metric-value">{len(artifacts.processed_data)}</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-with metric_col2:
-    st.markdown(
-        f"""
-        <div class="card">
-            <div class="metric-label">Amostras de treinamento</div>
-            <div class="metric-value">{len(artifacts.x_train)}</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-with metric_col3:
-    st.markdown(
-        f"""
-        <div class="card">
-            <div class="metric-label">Acuracia do modelo</div>
-            <div class="metric-value">{artifacts.accuracy * 100:.2f}%</div>
-        </div>
-        """,
-        unsafe_allow_html=True,
-    )
-
-
-tab1, tab2, tab3, tab4 = st.tabs(
-    [
-        "Visao geral",
-        "Pre-processamento",
-        "Avaliacao",
-        "Nova classificacao",
-    ]
-)
-
-with tab1:
-    left, right = st.columns([1.05, 0.95])
-
-    with left:
-        st.markdown('<div class="content-panel">', unsafe_allow_html=True)
-        st.subheader("Resumo do projeto")
-        st.write(
-            """
-            Nesta aplicacao, organizamos o trabalho em uma sequencia bem direta:
-            carregar os dados, preparar o dataset, treinar o modelo e permitir
-            que o usuario faca uma nova classificacao.
-            """
-        )
+# ── Metrics ───────────────────────────────────────────────────────────────────
+c1, c2, c3 = st.columns(3)
+metrics = [
+    ("🗂️", "Amostras válidas", len(artifacts.processed_data), "após limpeza do CSV"),
+    ("📚", "Treinamento", len(artifacts.x_train), "80% do dataset"),
+    ("🎯", "Acurácia", f"{artifacts.accuracy * 100:.1f}%", "no conjunto de teste"),
+]
+for col, (icon, label, value, sub) in zip([c1, c2, c3], metrics):
+    with col:
         st.markdown(
-            """
-            <div class="step-box">
-                <strong>Passo 1:</strong> ler e tratar o arquivo CSV<br>
-                <strong>Passo 2:</strong> converter os valores categoricos para inteiros<br>
-                <strong>Passo 3:</strong> dividir os dados em treino e teste<br>
-                <strong>Passo 4:</strong> treinar o modelo e analisar os resultados
-            </div>
-            """,
+            f"""<div class="metric-card">
+                <div class="metric-icon">{icon}</div>
+                <div class="metric-label">{label}</div>
+                <div class="metric-value">{value}</div>
+                <div class="metric-sub">{sub}</div>
+            </div>""",
             unsafe_allow_html=True,
         )
-        st.write("Modelo escolhido: `Decision Tree`")
-        st.write("Divisao do conjunto: `80% para treino` e `20% para teste`")
+
+st.markdown("<div style='margin-top:1.2rem'></div>", unsafe_allow_html=True)
+
+# ── Tabs ──────────────────────────────────────────────────────────────────────
+tab1, tab2, tab3, tab4 = st.tabs(
+    ["📊 Distribuição", "🔬 Dados", "📋 Avaliação", "🐧 Classificar"]
+)
+
+# ── Tab 1: Distribution ───────────────────────────────────────────────────────
+with tab1:
+    left, right = st.columns(2, gap="small")
+
+    with left:
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.markdown('<div class="card-title">📊 Espécies no dataset</div>', unsafe_allow_html=True)
+
+        counts = artifacts.data.dropna()["species"].value_counts()
+        total = counts.sum()
+        bar_cfg = {
+            "Adelie":    ("#d97b3d", "Adeline"),
+            "Chinstrap": ("#3d82c8", "Chinstrap"),
+            "Gentoo":    ("#2d9e6e", "Gentoo"),
+        }
+        bars = ""
+        for sp, cnt in counts.items():
+            color, label = bar_cfg.get(sp, ("#888", sp))
+            pct = int(cnt / total * 100)
+            bars += f"""
+            <div style="margin-bottom:16px">
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.85rem">
+                    <span style="font-weight:500">{label}</span>
+                    <span style="color:#7d9070">{cnt} · {pct}%</span>
+                </div>
+                <div style="background:#f0f4ee;border-radius:6px;height:10px;overflow:hidden">
+                    <div style="width:{pct}%;height:100%;background:{color};border-radius:6px"></div>
+                </div>
+            </div>"""
+        st.markdown(bars, unsafe_allow_html=True)
+        st.markdown(
+            '<div class="callout">Adeline representa ~44% das amostras. A Decision Tree lida bem com esse leve desbalanceamento.</div>',
+            unsafe_allow_html=True,
+        )
         st.markdown("</div>", unsafe_allow_html=True)
 
     with right:
-        st.markdown('<div class="content-panel">', unsafe_allow_html=True)
-        st.subheader("Distribuicao das especies")
-        st.write("Esse grafico mostra como as amostras estao divididas no dataset utilizado.")
-        st.bar_chart(
-            artifacts.data.dropna()["species"].value_counts().rename_axis("species")
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.markdown('<div class="card-title">🗺️ Distribuição por ilha</div>', unsafe_allow_html=True)
+
+        island_counts = artifacts.data.dropna()["island"].value_counts()
+        total_i = island_counts.sum()
+        island_colors = {"Biscoe": "#5b7fa6", "Dream": "#7a6ea6", "Torgersen": "#a6836e"}
+        ibars = ""
+        for isl, cnt in island_counts.items():
+            color = island_colors.get(isl, "#888")
+            pct = int(cnt / total_i * 100)
+            ibars += f"""
+            <div style="margin-bottom:16px">
+                <div style="display:flex;justify-content:space-between;margin-bottom:6px;font-size:0.85rem">
+                    <span style="font-weight:500">{isl}</span>
+                    <span style="color:#7d9070">{cnt} · {pct}%</span>
+                </div>
+                <div style="background:#f0f4ee;border-radius:6px;height:10px;overflow:hidden">
+                    <div style="width:{pct}%;height:100%;background:{color};border-radius:6px"></div>
+                </div>
+            </div>"""
+        st.markdown(ibars, unsafe_allow_html=True)
+        st.markdown(
+            '<div class="callout">Gentoo habita quase exclusivamente a ilha Biscoe. Chinstrap é predominante em Dream.</div>',
+            unsafe_allow_html=True,
         )
         st.markdown("</div>", unsafe_allow_html=True)
 
+# ── Tab 2: Data ───────────────────────────────────────────────────────────────
 with tab2:
-    st.markdown('<div class="content-panel">', unsafe_allow_html=True)
-    st.subheader("Dados originais")
-    st.write("Aqui estao algumas linhas do CSV antes do tratamento.")
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<div class="card-title">📄 Dados originais (10 primeiras linhas)</div>', unsafe_allow_html=True)
     st.dataframe(artifacts.data.head(10), use_container_width=True)
+    st.markdown("</div>", unsafe_allow_html=True)
 
-    st.subheader("Dados apos limpeza, conversao e reordenacao")
-    st.write(
-        "Depois da limpeza, os dados categoricos foram convertidos para numeros e as colunas foram colocadas na ordem pedida."
-    )
+    st.markdown("<div style='margin-top:12px'></div>", unsafe_allow_html=True)
+
+    st.markdown('<div class="card">', unsafe_allow_html=True)
+    st.markdown('<div class="card-title">✅ Após limpeza e conversão numérica</div>', unsafe_allow_html=True)
     st.dataframe(artifacts.processed_data.head(10), use_container_width=True)
-
-    st.caption(
-        "Observacao: o dataset original usa 'Adelie'. Como o enunciado traz 'Adeline', "
-        "o projeto considera os dois nomes como a mesma classe."
+    st.markdown(
+        '<div class="callout"><strong>Nota:</strong> "Adeline" (enunciado) = "Adelie" no dataset — mesma classe, código 0.</div>',
+        unsafe_allow_html=True,
     )
     st.markdown("</div>", unsafe_allow_html=True)
 
+# ── Tab 3: Evaluation ─────────────────────────────────────────────────────────
 with tab3:
-    result_left, result_right = st.columns(2)
+    rl, rr = st.columns(2, gap="small")
 
-    with result_left:
-        st.markdown('<div class="content-panel">', unsafe_allow_html=True)
-        st.subheader("Relatorio de classificacao")
-        st.write("Essas metricas mostram o desempenho do modelo no conjunto de teste.")
+    with rl:
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.markdown('<div class="card-title">📋 Relatório de classificação</div>', unsafe_allow_html=True)
         st.code(artifacts.report_text, language="text")
         st.markdown("</div>", unsafe_allow_html=True)
 
-    with result_right:
+    with rr:
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.markdown('<div class="card-title">🔍 Real vs Previsto</div>', unsafe_allow_html=True)
+
         comparison = artifacts.x_test.copy()
-        comparison["valor real"] = artifacts.y_test.map(
-            {0: "Adeline", 1: "Chinstrap", 2: "Gentoo"}
+        comparison["Real"] = artifacts.y_test.map(SPECIES_LABELS)
+        comparison["Previsto"] = artifacts.predictions.map(SPECIES_LABELS)
+        comparison["Acerto"] = comparison["Real"] == comparison["Previsto"]
+
+        st.dataframe(
+            comparison.head(15),
+            use_container_width=True,
+            column_config={"Acerto": st.column_config.CheckboxColumn("✓")},
         )
-        comparison["previsao"] = artifacts.predictions.map(
-            {0: "Adeline", 1: "Chinstrap", 2: "Gentoo"}
-        )
-        st.markdown('<div class="content-panel">', unsafe_allow_html=True)
-        st.subheader("Exemplos do conjunto de teste")
-        st.write("Comparacao entre o valor real e a previsao feita pelo modelo.")
-        st.dataframe(comparison.head(12), use_container_width=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
+# ── Tab 4: Classify ───────────────────────────────────────────────────────────
 with tab4:
-    form_col, info_col = st.columns([1.05, 0.95])
+    fl, fr = st.columns([1.15, 0.85], gap="small")
 
-    with form_col:
-        st.markdown('<div class="content-panel">', unsafe_allow_html=True)
-        st.subheader("Teste uma nova classificacao")
-        st.write(
-            "Preencha os campos abaixo com os dados de um pinguim e clique no botao para ver a especie prevista."
-        )
+    with fl:
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.markdown('<div class="card-title">🐧 Dados do pinguim</div>', unsafe_allow_html=True)
 
-        island_name = st.selectbox("Ilha", list(ISLAND_MAP.keys()))
-        sex_name = st.selectbox("Sexo", list(SEX_MAP.keys()))
-        culmen_length = st.number_input(
-            "Culmen length mm", min_value=30.0, max_value=65.0, value=45.2, step=0.1
-        )
-        culmen_depth = st.number_input(
-            "Culmen depth mm", min_value=13.0, max_value=25.0, value=17.1, step=0.1
-        )
-        flipper_length = st.number_input(
-            "Flipper length mm", min_value=170.0, max_value=240.0, value=210.0, step=1.0
-        )
-        body_mass = st.number_input(
-            "Body mass g", min_value=2500.0, max_value=6500.0, value=4200.0, step=50.0
-        )
+        col_a, col_b = st.columns(2)
+        with col_a:
+            island_name = st.selectbox("Ilha", list(ISLAND_MAP.keys()))
+        with col_b:
+            sex_name = st.selectbox("Sexo", list(SEX_MAP.keys()))
 
-        if st.button("Classificar pinguim", use_container_width=True):
+        culmen_length = st.slider("Culmen length (mm)", 30.0, 65.0, 45.2, 0.1, format="%.1f mm")
+        culmen_depth = st.slider("Culmen depth (mm)", 13.0, 25.0, 17.1, 0.1, format="%.1f mm")
+        flipper_length = st.slider("Flipper length (mm)", 170.0, 240.0, 210.0, 1.0, format="%.0f mm")
+        body_mass = st.slider("Body mass (g)", 2500.0, 6500.0, 4200.0, 50.0, format="%.0f g")
+
+        if st.button("Classificar →", use_container_width=True):
             _, species_name = predict_species(
                 artifacts.model,
                 island=ISLAND_MAP[island_name],
@@ -351,11 +437,19 @@ with tab4:
                 body_mass=body_mass,
             )
 
+            descs = {
+                "Adeline":   "Bico curto e largo. Encontrada nas três ilhas do arquipélago.",
+                "Chinstrap": "Listra preta sob o queixo. Prefere a ilha Dream.",
+                "Gentoo":    "A maior das três. Nadadeiras longas, quase exclusiva da Biscoe.",
+            }
+
             st.markdown(
                 f"""
-                <div class="prediction-box">
-                    <div class="prediction-title">Resultado previsto</div>
-                    <div class="prediction-species">{species_name}</div>
+                <div class="result-wrap">
+                    <div class="result-emoji">🐧</div>
+                    <div class="result-eyebrow">Espécie identificada</div>
+                    <div class="result-name">{species_name}</div>
+                    <div class="result-desc">{descs.get(species_name, '')}</div>
                 </div>
                 """,
                 unsafe_allow_html=True,
@@ -363,13 +457,43 @@ with tab4:
 
         st.markdown("</div>", unsafe_allow_html=True)
 
-    with info_col:
-        st.markdown('<div class="content-panel">', unsafe_allow_html=True)
-        st.subheader("Ajuda rapida")
-        st.write("Os mapeamentos abaixo foram usados no pre-processamento do dataset.")
-        st.write("`island` -> Biscoe = 0, Dream = 1, Torgersen = 2")
-        st.write("`sex` -> FEMALE = 0, MALE = 1")
-        st.write("`species` -> Adeline = 0, Chinstrap = 1, Gentoo = 2")
-        st.info(
+    with fr:
+        st.markdown('<div class="card">', unsafe_allow_html=True)
+        st.markdown('<div class="card-title">💡 Dicas de identificação</div>', unsafe_allow_html=True)
+
+        tips = [
+            ("Adeline",   "badge-0", "Bico curto · profundidade > 17mm"),
+            ("Chinstrap", "badge-1", "Ilha Dream · bico fino"),
+            ("Gentoo",    "badge-2", "Nadadeira > 210mm · Biscoe"),
+        ]
+        tips_html = "".join(
+            f'<div class="tip-row"><span class="badge {cls}">{name}</span>'
+            f'<span class="tip-hint">{hint}</span></div>'
+            for name, cls, hint in tips
         )
+        st.markdown(tips_html, unsafe_allow_html=True)
+
+        st.markdown(
+            '<div class="callout">Ajuste os sliders e veja como o modelo reage a diferentes combinações.</div>',
+            unsafe_allow_html=True,
+        )
+
+        st.markdown("<div style='margin-top:20px'></div>", unsafe_allow_html=True)
+        st.markdown('<div class="card-title">🗺️ Mapeamentos numéricos</div>', unsafe_allow_html=True)
+
+        mappings = [
+            ("Biscoe / Dream / Torgersen", "0 / 1 / 2"),
+            ("FEMALE / MALE", "0 / 1"),
+            ("Adeline / Chinstrap / Gentoo", "0 / 1 / 2"),
+        ]
+        map_html = "".join(
+            f"""<div style="display:flex;justify-content:space-between;align-items:center;
+                            padding:8px 0;border-bottom:1px solid #f0f4ee;font-size:0.82rem">
+                <span style="color:#5a6b4e">{k}</span>
+                <span style="font-family:'DM Mono',monospace;color:#1b4332;font-weight:500">{v}</span>
+            </div>"""
+            for k, v in mappings
+        )
+        st.markdown(map_html, unsafe_allow_html=True)
+
         st.markdown("</div>", unsafe_allow_html=True)
